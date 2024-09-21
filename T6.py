@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
-from sage.all import cos, sin, var
 from scipy.optimize import fsolve as fsolven
+from sympy import cos, sin
 
 
 def fsolve(func, x0, args):
@@ -362,18 +362,18 @@ link = {
 }
 
 # Finding angle between O4-B and B-C
-A_O4BC = var("A_O4BC")
-eq = cos(A_O4BC) == (link["41"].l ** 2 + link["42"].l ** 2 - link["43"].l ** 2) / (
-    2 * link["41"].l * link["42"].l
+A_O4BC = np.arccos(
+    (link["41"].l ** 2 + link["42"].l ** 2 - link["43"].l ** 2)
+    / (2 * link["41"].l * link["42"].l)
 )
-A_O4BC = eq.solve(A_O4BC)[0].rhs()
-beta = (np.pi - A_O4BC).n()
+beta = np.pi - A_O4BC
 
 
 USE_NR = False
 
 s = State()
 
-State.plot(y="x", lw=2, savefig=True)
-State.plot(y="v", c="g", lw=2, savefig=True)
+# %%
+State.plot(y="x", lw=2, savefig=False)
+State.plot(y="v", c="g", lw=2, savefig=False)
 State.plot(y="a", c="orange", lw=2, savefig=False)
