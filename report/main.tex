@@ -1,3 +1,134 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage[a4paper, margin=1cm]{geometry}
+\usepackage{inconsolata}
+\usepackage{xcolor}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=blue,      
+    urlcolor=blue,
+    citecolor=blue,
+    linkbordercolor={0 0 1}
+}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{gray},
+    backgroundcolor=\color{lightgray!20},
+    frame=single,
+    breaklines=true,
+    captionpos=b,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false
+}
+
+\title{ME2201 T6}
+\author{Anton Beny M S, ME23B015}
+\date{September 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Loops and Equations}
+
+The 6 bar mechanism given is shown below
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{6bar.png}
+    \caption{6 bar mechanism}
+    \label{fig:6bar}
+\end{figure}
+
+In order to solve for the position, velocity and acceleration, we need two loops and their corresponding loop closure equations. The loops that I used are as follows:
+
+$$\text{Loop 1: } O_2 - A - B - O_4$$
+$$\text{Loop 2: } O_4 - B - C - D$$
+
+\subsection{Loop 1}
+
+Here, $\theta_2$ is the input angle and $\theta_3$ and $\theta_{41}$ are the unknown angles that Link $AB$ and Link $O_4B$ make with the horizontal respectively. The loop closure equations for Loop 1 is:
+
+\subsubsection{Displacement}
+$$l_2 \cos{\theta_2} + l_3 \cos{\theta_3} - l_{41} \cos{\theta_{41}} - 3.7 = 0$$
+$$l_2 \sin{\theta_2} + l_3 \sin{\theta_3} - l_{41} \sin{\theta_{41}} + 2 = 0$$
+
+\subsubsection{Velocity}
+$$l_2 \omega_2 \sin{\theta_2} + l_3 \omega_3 \sin{\theta_3} - l_{41} \omega_{41} \sin{\theta_{41}} = 0$$
+$$l_2 \omega_2 \cos{\theta_2} + l_3 \omega_3 \cos{\theta_3} - l_{41} \omega_{41} \cos{\theta_{41}} = 0$$
+
+\subsubsection{Acceleration}
+$$l_2 \omega_2^2 \cos{\theta_2} + l_2 \alpha_2 \sin{\theta_2} + l_3 \omega_3^2 \cos{\theta_3} + l_3 \alpha_3 \sin{\theta_3} - l_{41} \omega_{41}^2 \cos{\theta_{41}} - l_{41} \alpha_{41} \sin{\theta_{41}} = 0$$
+$$l_2 \omega_2^2 \sin{\theta_2} - l_2 \alpha_2 \cos{\theta_2} + l_3 \omega_3^2 \sin{\theta_3} - l_3 \alpha_3 \cos{\theta_3} - l_{41} \omega_{41}^2 \sin{\theta_{41}} + l_{41} \alpha_{41} \cos{\theta_{41}} = 0$$
+
+Using these equations, we can solve for angular velocities and accelerations of the links $AB$ and $O_4B$.
+
+The angular velocities and accelerations of link $O_4B$ will be used as the input angle for Loop 2.
+
+\subsection{Loop 2}
+
+Here, $\theta_{41}$ is the input angle and the unknowns are $\theta_5$ and $x$, where $\theta_5$ is the angle that Link $CD$ makes with the horizontal and $x$ is horizontal displacement of point $D$ with respect to origin at $O_2$. Another angle $\theta_{42}$ is will always be $\theta_{41} + \beta$, where $\beta$ is $180^\circ - \angle{O_4BC}$. The angular velocity and acceleration of link $BC$ will be the same as that of link $O_4B$. The loop closure equations for Loop 2 is:
+
+\subsubsection{Displacement}
+$$l_{41} \cos{\theta_{41}} + l_{42} \cos{(\theta_{41} + \beta)} - l_5 \cos{\theta_5} - (x - 3.7) = 0$$
+$$l_{41} \sin{\theta_{41}} + l_{42} \sin{(\theta_{41} + \beta)} - l_5 \sin{\theta_5} - 3 = 0$$
+
+\subsubsection{Velocity}
+$$l_{41} \omega_{41} \sin{\theta_{41}} + l_{42} \omega_{41} \sin{(\theta_{41} + \beta)} - l_5 \omega_5 \sin{\theta_5} + v = 0$$
+$$l_{41} \omega_{41} \cos{\theta_{41}} + l_{42} \omega_{41} \cos{(\theta_{41} + \beta)} - l_5 \omega_5 \cos{\theta_5} = 0$$
+
+\subsubsection{Acceleration}
+$$l_{41} \omega_{41}^2 \cos{\theta_{41}} + l_{41} \alpha_{41} \sin{\theta_{41}} + l_{42} \omega_{41}^2 \cos{(\theta_{41} + \beta)} + l_{42} \alpha_{41} \sin{(\theta_{41} + \beta)} - l_5 \omega_5^2 \cos{\theta_5} - l_5 \alpha_5 \sin{\theta_5} + a = 0$$
+$$l_{41} \omega_{41}^2 \sin{\theta_{41}} - l_{41} \alpha_{41} \cos{\theta_{41}} + l_{42} \omega_{41}^2 \sin{(\theta_{41} + \beta)} - l_{42} \alpha_{41} \cos{(\theta_{41} + \beta)} - l_5 \omega_5^2 \sin{\theta_5} + l_5 \alpha_5 \cos{\theta_5} = 0$$
+
+Using these equations, we can solve for displacement, velocity and acceleration of point $D$.
+
+\section{Results}
+Upon solving the above equations, we get the following results:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.52\textwidth]{disp.png}
+    \caption{Displacement of point D}
+    \label{fig:disp}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.52\textwidth]{vel.png}
+    \caption{Velocity of point D}
+    \label{fig:vel}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.52\textwidth]{acc.png}
+    \caption{Acceleration of point D}
+    \label{fig:acc}
+\end{figure}
+
+\section{Code}
+
+I have included the code that I used to solve the equations here. I have also included it in the form of a Google Colab notebook for ease of viewing/running the code. The Colab notebook can be found \href{https://colab.research.google.com/drive/1yX8z83YI7DqqWATXlR65TZzdsSwZuEFS?usp=sharing}{in this link}.
+
+I used Python for solving the equations. I also used \texttt{sympy} for symbolic calculations, \texttt{numpy} for numerical calculations, \texttt{scipy} for fsolve and \texttt{matplotlib} for plotting the results.
+
+\begin{lstlisting}
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
@@ -5,7 +136,7 @@ import sympy as sp
 from scipy.optimize import fsolve as fsolven
 from sympy import cos, sin
 
-plt.rcParams["text.usetex"] = True
+plt.rcParams["text.usetex"] = False
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.size"] = 12
 
@@ -73,7 +204,7 @@ class State:
             ),
             "xticks": kwargs.pop("xticks", np.linspace(0, 2 * np.pi, 7)),
             "xticklabels": kwargs.pop(
-                "xticklabels", [f"{x}°" for x in np.arange(0, 361, 60)]
+                "xticklabels", [f"{x}" for x in np.arange(0, 361, 60)]
             ),
         }
 
@@ -399,21 +530,23 @@ State.plot(
     lw=2,
     color="orange",
     label="Displacement",
-    xlabel=r"Crank angle $\theta_2$ (in degrees)",
-    ylabel=r"Displacement $x$ (in cm)",
+    # xlabel=r"Crank angle $\theta_2$ (in degrees)",
+    # ylabel=r"Displacement $x$ (in cm)",
 )
 State.plot(
     y="v",
     lw=2,
     color="green",
     label="Velocity",
-    xlabel=r"Crank angle $\theta_2$ (in degrees)",
-    ylabel=r"Velocity $v$ (in cm/s)",
+    # xlabel=r"Crank angle $\theta_2$ (in degrees)",
+    # ylabel=r"Velocity $v$ (in cm/s)",
 )
 State.plot(
     y="a",
     lw=2,
     label="Acceleration",
-    xlabel=r"Crank angle $\theta_2$ (in degrees)",
-    ylabel=r"Acceleration $a$ (in cm/s$^2$)",
+    # xlabel=r"Crank angle $\theta_2$ (in degrees)",
+    # ylabel=r"Acceleration $a$ (in cm/s$^2$)",
 )
+\end{lstlisting}
+\end{document}
