@@ -1,3 +1,142 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage[a4paper, margin=1.5cm]{geometry}
+\usepackage{inconsolata}
+\usepackage{xcolor}
+\usepackage{gensymb}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=blue,      
+    urlcolor=blue,
+    citecolor=blue,
+    linkbordercolor={0 0 1}
+} 
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{gray},
+    backgroundcolor=\color{lightgray!20},
+    frame=single,
+    breaklines=true,
+    captionpos=b,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false
+}
+
+\title{ME2201 T8}
+\author{Anton Beny M S, ME23B015}
+\date{October 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Radial Roller: Graphical Method}
+
+For the given follower motion, the equations for rise and return is given by:
+
+$$y_{rise} (\theta) = 40 \left (\frac{\theta}{180^{\circ}} - \frac{1}{2\pi}\sin\left (2\pi \frac{\theta}{180^{\circ}}\right )\right )$$
+$$y_{return} (\theta) = 40 - 40\left (\frac{\theta - 180^{\circ}}{180^{\circ}} - \frac{1}{2\pi}\sin\left (2\pi \frac{\theta - 180^{\circ}}{180^{\circ}}\right )\right )$$
+
+\subsection{Geogebra}
+
+I used Geogebra to plot the radial roller follower motion. The plot is shown below:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/Q1.png}
+    \caption{Radial Roller Follower Motion}
+\end{figure}
+
+\subsubsection{Implementation}
+
+In order to make life a bit easier, I used \texttt{Sequence} function in Geogebra to easily plot the Cam Profile. The code is shown below:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/ggb1.png}
+    \caption{Putting equationsin Geogebra}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/ggb2.png}
+    \caption{Using \texttt{If} condition for piecewise function}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/ggb3.png}
+    \caption{Using \texttt{Sequence} function to plot the cam profile}
+\end{figure}
+
+\section{Radial Roller: Analytical Method}
+
+The Analytical equations for the radial roller follower motion is given by:
+
+$$X_{C} = \{R_r \sin(\phi)\}\cos(\theta) + (R_P + y(\theta) - R_r \cos(\phi))\sin(\theta)$$
+$$Y_{C} = -\{R_r \sin(\phi)\}\sin(\theta) + (R_P + y(\theta) - R_r \cos(\phi))\cos(\theta)$$
+
+And the pressure angle $\phi$ is given by:
+
+$$\phi = \tan^{-1}\left \{ \frac{y'(\theta)}{R_P + y(\theta)}\right \}$$
+
+The Cam Profile is shown below:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/Q2.png}
+    \caption{Radial Roller Follower Motion($R_P = 50 \text{ mm}$)}
+\end{figure}
+
+The pressure angle variation is shown below:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/Q2_2.png}
+    \caption{Pressure Angle Variation}
+\end{figure}
+
+\section{Flat Faced Follower: Analytical}
+
+The Analytical equations for the flat faced follower motion is given by:
+
+$$X_C(\theta) = y'(\theta)\cos(\theta) + (R_b + y(\theta))\sin(\theta)$$
+$$Y_C(\theta) = -y'(\theta)\sin(\theta) + (R_b + y(\theta))\cos(\theta)$$
+
+The Cam Profile is shown below:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Q3.png}
+    \caption{Flat Faced Follower Motion}
+\end{figure}
+
+The minimum width of the flat faced follower is given by:
+
+$$\text{Minimum Width} = y'_\text{max} + y'_\text{min}$$
+
+This value is calculated to be \textbf{59.6825 mm}.
+
+\section{Code}
+
+I have used Python to plot the cam profile and pressure angle variation analytically. The code given below is for both Q2 and Q3.
+
+\begin{lstlisting}
 # %%
 import sympy as sp
 import numpy as np
@@ -184,3 +323,45 @@ class Flat_Face(Follower):
             min_y_dot = min(min_y_dot, y_dot.subs("t", t_val))
 
         return (max_y_dot + abs(min_y_dot)).evalf()
+
+fig, ax = plt.subplots()
+ax.set_aspect("equal")
+
+steps = [
+    ("cycloidal", Range(0, pi), Range(0, 40)),
+    ("cycloidal", Range(pi, 2 * pi), Range(40, 0)),
+]
+motion = Motion(*steps)
+
+cam = Cam(radius=50, e=0, direction="CW")
+cam.plot_pitch_circle(ax, motion, label="Pitch Curve")
+follower = Roller(radius=10)
+follower.plot_cam_profile(ax, motion, cam, label="Cam Profile")
+
+plt.legend()
+plt.grid()
+plt.show()
+plt.close()
+
+fig, ax = plt.subplots()
+ax.set_aspect("equal")
+
+steps = [
+    (0, Range(0, pi / 2), Range(0, 0)),
+    ("345", Range(pi / 2, pi), Range(0, 25)),
+    (25, Range(pi, 3 * pi / 2), Range(25, 25)),
+    ("345", Range(3 * pi / 2, 2 * pi), Range(25, 0)),
+]
+motion = Motion(*steps)
+cam = Cam(radius=50, e=15, direction="ACW")
+cam.plot_base_circle(ax, label="Base Circle")
+follower = Flat_Face()
+follower.plot_cam_profile(ax, motion, cam, label="Cam Profile")
+print("Minimum Width:", follower.min_width(motion))
+
+plt.legend()
+plt.grid()
+plt.show()
+plt.close()
+\end{lstlisting}
+\end{document}
