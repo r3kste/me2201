@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
-from analytical import plt, pi, Range, Motion, Cam, Flat_Face
+from analytical import sp, plt, pi, Range, Motion, Cam, Flat_Face, t
 
 fig, ax = plt.subplots()
 ax.set_aspect("equal")

@@ -2,12 +2,14 @@
 import sympy as sp
 import numpy as np
 import matplotlib as mpl
+import math
 import matplotlib.pyplot as plt
 from numpy import pi
 
+
 # %%
 t = sp.symbols("t")
-PRECISION = 100
+PRECISION = 300
 
 
 class Range:
@@ -204,3 +206,84 @@ def find_minima_by_iter(f, t, t_range):
             minima_t = t_val
 
     return minima_t, minima
+
+
+def find_maxima_by_iter(f, t, t_range):
+    maxima = -float("inf")
+    maxima_t = None
+    for t_val in t_range:
+        f_val = f.subs(t, t_val)
+        if f_val > maxima:
+            maxima = f_val
+            maxima_t = t_val
+
+    return maxima_t, maxima
+
+
+theta_ri = 1.7
+alpha = 3.6
+L = 50
+w = 10  # angular velocity in rad/sec
+motion = Motion(
+    ("3-4-5", Range(0, theta_ri), Range(0, L)),
+    (L, Range(theta_ri, 2), Range(L, L)),
+    ("3-4-5", Range(2.0, alpha), Range(L, 0)),
+    (0, Range(alpha, 2 * pi), Range(0, 0)),
+)
+
+# Lift of follower in mm at theta = 1 radian
+print(f"2(a) Lift of follower at theta = 1 rad: {motion(1)} mm")
+
+# Lift of the follower in mm at theta = 2.5 radians
+print(f"2(b) Lift of follower at theta = 2.5 rad: {motion(2.5)} mm")
+
+vel = sp.diff(motion.y, t) * w
+# Velocity of the follower in mm/sec at theta = 1 radian
+print(f"2(c) Velocity of follower at theta = 1 rad: {vel.subs(t, 1)} mm/sec")
+
+# Velocity of the follower in mm/sec theta = 2.5 radians
+print(f"2(d) Velocity of follower at theta = 2.5 rad: {vel.subs(t, 2.5)} mm/sec")
+
+acc = sp.diff(vel, t) * w
+# Acceleration of the follower in mm/sec^2 at theta = 1 radian
+print(f"2(e) Acceleration of follower at theta = 1 rad: {acc.subs(t, 1)} mm/sec^2")
+
+# Acceleration of the follower in mm/sec^2 at theta = 2.5 radians
+print(f"2(f) Acceleration of follower at theta = 2.5 rad: {acc.subs(t, 2.5)} mm/sec^2")
+
+
+# Question 3
+cam = Cam(radius=50, e=20, direction="CCW")
+follower = Roller(radius=10)
+
+# Maximum pressure angle in radians
+phi = cam.pressure_angle(motion)
+max_phi = find_maxima_by_iter(phi, t, np.arange(0, 2 * pi, 0.01))[1]
+print(f"\n3(a) Maximum pressure angle: {max_phi.evalf()} rad")
+
+# Let C be the contact point between the roller and the cam profile at θ = 1 radian.
+# Determine the distance (in mm) between the cam center and C
+cam_profile = follower.cam_profile(motion, cam)
+X_1, Y_1 = cam_profile[0].subs(t, 1).evalf(), cam_profile[1].subs(t, 1).evalf()
+dist = math.sqrt(X_1**2 + Y_1**2)
+print(f"3(b) Distance between cam center and C at theta = 1 rad: {dist} mm")
+
+# Question 4
+# Determine the maximum eccentricity of the driving effort (in mm) during the rise
+cam = Cam(radius=40, e=20, direction="CCW")
+follower = Flat_Face()
+y_dot = sp.diff(motion.y, t)
+y_dot_max = find_maxima_by_iter(y_dot, t, np.arange(0, 2 * pi, 0.01))[1]
+
+e_max = 20
+epsilon = y_dot_max - e_max
+print(f"\n4(a) {epsilon}")
+
+print(f"4(b) {follower.min_width(motion)}")
+
+# Let C be the contact point between the roller and the cam profile at θ = 1 radian.
+# Determine the distance (in mm) between the cam center and C
+cam_profile = follower.cam_profile(motion, cam)
+X_1, Y_1 = cam_profile[0].subs(t, 1).evalf(), cam_profile[1].subs(t, 1).evalf()
+dist = math.sqrt(X_1**2 + Y_1**2)
+print(f"4(c) Distance between cam center and C at theta = 1 rad: {dist} mm")

@@ -3,7 +3,7 @@ import sympy as sp
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from numpy import pi
+from sympy import pi
 
 # %%
 t = sp.symbols("t")
@@ -175,32 +175,56 @@ class Flat_Face(Follower):
             y_c.append(Y_c.subs("t", t))
         ax.plot(x_c, y_c, **kwargs)
 
-    def min_width(self, motion, t_range=None):
+    def min_width(self, motion):
         max_y_dot = 0
         min_y_dot = 0
         y_dot = sp.diff(motion.y, t)
-
-        if t_range is None:
-            t_range = np.arange(0, 2 * np.pi, 0.01)
-        for t_val in t_range:
+        for t_val in np.linspace(0, 2 * np.pi, PRECISION * 10):
             max_y_dot = max(max_y_dot, y_dot.subs("t", t_val))
             min_y_dot = min(min_y_dot, y_dot.subs("t", t_val))
 
         return (max_y_dot + abs(min_y_dot)).evalf()
 
-    def radius_of_curvature(self, motion, cam):
-        y_dot = sp.diff(motion.y, t)
-        y_dot_dot = sp.diff(y_dot, t)
-        return cam.R + motion.y + y_dot_dot**2
+mpl.rcParams["text.usetex"] = True
+mpl.rcParams["font.family"] = "serif"
+mpl.rcParams["font.size"] = 12
 
+fig, ax = plt.subplots()
+ax.set_aspect("equal")
 
-def find_minima_by_iter(f, t, t_range):
-    minima = float("inf")
-    minima_t = None
-    for t_val in t_range:
-        f_val = f.subs(t, t_val)
-        if f_val < minima:
-            minima = f_val
-            minima_t = t_val
+steps = [
+    ("cycloidal", Range(0, pi), Range(0, 40)),
+    ("cycloidal", Range(pi, 2 * pi), Range(40, 0)),
+]
+motion = Motion(*steps)
 
-    return minima_t, minima
+cam = Cam(radius=50, e=0, direction="CW")
+cam.plot_pitch_circle(ax, motion, label="Pitch Curve")
+follower = Roller(radius=10)
+follower.plot_cam_profile(ax, motion, cam, label="Cam Profile")
+
+plt.legend()
+plt.grid()
+plt.show()
+plt.close()
+
+fig, ax = plt.subplots()
+ax.set_aspect("equal")
+
+steps = [
+    (0, Range(0, pi / 2), Range(0, 0)),
+    ("345", Range(pi / 2, pi), Range(0, 25)),
+    (25, Range(pi, 3 * pi / 2), Range(25, 25)),
+    ("345", Range(3 * pi / 2, 2 * pi), Range(25, 0)),
+]
+motion = Motion(*steps)
+cam = Cam(radius=50, e=15, direction="ACW")
+cam.plot_base_circle(ax, label="Base Circle")
+follower = Flat_Face()
+follower.plot_cam_profile(ax, motion, cam, label="Cam Profile")
+print("Minimum Width:", follower.min_width(motion))
+
+plt.legend()
+plt.grid()
+plt.show()
+plt.close()
